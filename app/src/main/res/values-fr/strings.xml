@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tab_explore">Explorer</string>
+    <string name="tab_search">Rechercher</string>
+    <string name="tab_my_day">Ma journée</string>
+    <string name="tab_account">Compte</string>
+    <string name="coming_soon">Bientôt disponible</string>
+
+    <string name="explore_title">Près de Trafalgar Square aujourd\'hui</string>
+    <string name="explore_with_events">Avec des événements aujourd\'hui</string>
+    <string name="explore_without_events">Autres lieux à proximité</string>
+    <string name="distance_metres">%d m</string>
+    <plurals name="event_count">
+        <item quantity="one">%d événement</item>
+        <item quantity="many">%d événements</item>
+        <item quantity="other">%d événements</item>
+    </plurals>
+
+    <string name="login_title">Connexion</string>
+    <string name="field_email">E-mail</string>
+    <string name="field_password">Mot de passe</string>
+    <string name="action_log_in">Se connecter</string>
+    <string name="action_log_out">Se déconnecter</string>
+    <string name="action_try_again">Réessayer</string>
+
+    <string name="error_offline">Vous semblez être hors ligne. Vérifiez votre connexion et réessayez.</string>
+    <string name="error_unauthorized">Veuillez vous reconnecter.</string>
+    <string name="error_not_found">Introuvable.</string>
+    <string name="error_rate_limited">Trop de tentatives. Veuillez réessayer plus tard.</string>
+    <string name="error_validation">Veuillez vérifier les informations et réessayer.</string>
+    <string name="error_generic">Une erreur s\'est produite. Veuillez réessayer plus tard.</string>
+</resources>

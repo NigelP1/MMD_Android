@@ -1,0 +1,21 @@
+# Gradle and build output
+.gradle/
+build/
+/captures
+.externalNativeBuild/
+.cxx/
+
+# Android Studio
+.idea/
+*.iml
+.kotlin/
+
+# Local settings and secrets
+local.properties
+secrets.properties
+*.jks
+*.keystore
+*.p12
+
+# macOS
+.DS_Store

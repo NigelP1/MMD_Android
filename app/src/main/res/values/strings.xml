@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Make My Day</string>
+
+    <string name="tab_explore">Explore</string>
+    <string name="tab_search">Search</string>
+    <string name="tab_my_day">My Day</string>
+    <string name="tab_account">Account</string>
+    <string name="coming_soon">Coming soon</string>
+
+    <string name="explore_title">Near Trafalgar Square today</string>
+    <string name="explore_with_events">With events today</string>
+    <string name="explore_without_events">Other venues nearby</string>
+    <string name="distance_metres">%d m</string>
+    <plurals name="event_count">
+        <item quantity="one">%d event</item>
+        <item quantity="other">%d events</item>
+    </plurals>
+
+    <string name="login_title">Log in</string>
+    <string name="field_email">Email</string>
+    <string name="field_password">Password</string>
+    <string name="action_log_in">Log in</string>
+    <string name="action_log_out">Log out</string>
+    <string name="action_try_again">Try again</string>
+
+    <string name="error_offline">You appear to be offline. Check your connection and try again.</string>
+    <string name="error_unauthorized">Please log in again.</string>
+    <string name="error_not_found">That couldn\'t be found.</string>
+    <string name="error_rate_limited">Too many attempts. Please try again later.</string>
+    <string name="error_validation">Please check the details and try again.</string>
+    <string name="error_generic">Something went wrong. Please try again later.</string>
+</resources>

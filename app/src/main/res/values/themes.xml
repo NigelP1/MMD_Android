@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Compose draws everything; this only sets the window before the first frame -->
+    <style name="Theme.MMD" parent="android:Theme.Material.Light.NoActionBar" />
+
+    <style name="Theme.MMD.Starting" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/mmd_sky</item>
+        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher_foreground</item>
+        <item name="postSplashScreenTheme">@style/Theme.MMD</item>
+    </style>
+</resources>

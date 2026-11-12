@@ -59,6 +59,10 @@
     <string name="action_remove_from_my_day">Take out of My Day</string>
     <string name="action_visit_website">Visit website</string>
     <string name="action_walking_directions">Walking directions</string>
+    <string name="walk_summary">%1$d min walk · %2$s</string>
+    <string name="action_clear_route">Clear route</string>
+    <string name="walk_failed_title">Couldn\'t find a walking route</string>
+    <string name="walk_failed_message">Google Maps didn\'t return a route.</string>
     <string name="action_open_in_maps">Open in Maps</string>
     <string name="facility_access">Access</string>
     <string name="facility_access_description">Step-free access</string>

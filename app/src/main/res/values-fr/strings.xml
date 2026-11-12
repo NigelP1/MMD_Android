@@ -58,6 +58,10 @@
     <string name="action_remove_from_my_day">Retirer de Ma journée</string>
     <string name="action_visit_website">Consulter le site web</string>
     <string name="action_walking_directions">Itinéraire à pied</string>
+    <string name="walk_summary">%1$d min à pied · %2$s</string>
+    <string name="action_clear_route">Effacer l’itinéraire</string>
+    <string name="walk_failed_title">Impossible de trouver un itinéraire à pied</string>
+    <string name="walk_failed_message">Google Maps n’a renvoyé aucun itinéraire.</string>
     <string name="action_open_in_maps">Ouvrir dans Maps</string>
     <string name="facility_access">Accès</string>
     <string name="facility_access_description">Accès de plain-pied</string>

@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.DirectionsWalk
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.CurrencyPound
@@ -52,6 +51,7 @@ import uk.makemydaylondon.mmd.ui.common.ReadableWidth
 import uk.makemydaylondon.mmd.ui.common.SectionHeader
 import uk.makemydaylondon.mmd.ui.common.VenueRow
 import uk.makemydaylondon.mmd.ui.common.VenueStyle
+import uk.makemydaylondon.mmd.ui.common.WalkingDirectionsRow
 import uk.makemydaylondon.mmd.ui.common.rememberFormatter
 
 /** An event: when and where, cost, description, Save and My Day, and links out. */
@@ -60,6 +60,7 @@ fun EventScreen(
     onBack: () -> Unit,
     onOpenVenue: (Int) -> Unit,
     onLogIn: () -> Unit,
+    onShowMap: () -> Unit,
     viewModel: EventViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -81,6 +82,7 @@ fun EventScreen(
                         onSetSaved = { if (signedIn) viewModel.setSaved(it) else onLogIn() },
                         onSetInMyDay = { if (signedIn) viewModel.setInMyDay(it) else onLogIn() },
                         onOpenVenue = { onOpenVenue(s.value.venue.id) },
+                        onShowMap = onShowMap,
                     )
                 }
             }
@@ -98,6 +100,7 @@ private fun EventDetailsContent(
     onSetSaved: (Boolean) -> Unit,
     onSetInMyDay: (Boolean) -> Unit,
     onOpenVenue: () -> Unit,
+    onShowMap: () -> Unit,
 ) {
     val (event, venue) = details
     val context = LocalContext.current
@@ -157,9 +160,7 @@ private fun EventDetailsContent(
         ExternalLinks.share(context, event.title, listOfNotNull(shareSummary, event.moreInfoUrl).joinToString("\n"))
     })
     if (venue.location.isKnown) {
-        DetailRow(Icons.AutoMirrored.Filled.DirectionsWalk, stringResource(R.string.action_walking_directions), onClick = {
-            ExternalLinks.walkingDirections(context, venue)
-        })
+        WalkingDirectionsRow(venue, onShowMap)
     }
 
     SectionHeader(stringResource(R.string.section_venue))

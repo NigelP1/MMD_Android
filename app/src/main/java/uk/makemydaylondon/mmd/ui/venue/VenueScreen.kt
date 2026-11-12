@@ -12,7 +12,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.DirectionsWalk
 import androidx.compose.material.icons.automirrored.filled.Accessible
 import androidx.compose.material.icons.filled.DirectionsBus
 import androidx.compose.material.icons.filled.LocalCafe
@@ -65,6 +64,7 @@ import uk.makemydaylondon.mmd.ui.common.ReadableWidth
 import uk.makemydaylondon.mmd.ui.common.SectionHeader
 import uk.makemydaylondon.mmd.ui.common.VenueBadge
 import uk.makemydaylondon.mmd.ui.common.VenueStyle
+import uk.makemydaylondon.mmd.ui.common.WalkingDirectionsRow
 import uk.makemydaylondon.mmd.ui.common.rememberFormatter
 import uk.makemydaylondon.mmd.ui.common.relativeDay
 
@@ -74,6 +74,7 @@ fun VenueScreen(
     onBack: () -> Unit,
     onOpenEvent: (venueId: Int, eventId: Int) -> Unit,
     onLogIn: () -> Unit,
+    onShowMap: () -> Unit,
     viewModel: VenueViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -95,6 +96,7 @@ fun VenueScreen(
                         onAddToMyDay = { if (signedIn) pickingDay = true else onLogIn() },
                         onRemovePlan = viewModel::removePlan,
                         onOpenEvent = { onOpenEvent(s.value.id, it) },
+                        onShowMap = onShowMap,
                     )
                 }
             }
@@ -119,6 +121,7 @@ private fun LazyListScope.venueDetails(
     onAddToMyDay: () -> Unit,
     onRemovePlan: (uk.makemydaylondon.mmd.data.model.PlannedVenue) -> Unit,
     onOpenEvent: (Int) -> Unit,
+    onShowMap: () -> Unit,
 ) {
     item(key = "header") { Header(venue) }
 
@@ -148,7 +151,7 @@ private fun LazyListScope.venueDetails(
         if (!signedIn) Footnote(stringResource(R.string.venue_log_in_to_plan))
     }
 
-    item(key = "getting-there") { GettingThere(venue) }
+    item(key = "getting-there") { GettingThere(venue, onShowMap) }
 
     venue.description?.takeIf { it.isNotBlank() }?.let { description ->
         item(key = "about") {
@@ -235,7 +238,7 @@ private fun FacilitiesRow(facilities: Facilities) {
 }
 
 @Composable
-private fun GettingThere(venue: Venue) {
+private fun GettingThere(venue: Venue, onShowMap: () -> Unit) {
     val context = LocalContext.current
     Column {
         SectionHeader(stringResource(R.string.section_getting_there))
@@ -243,9 +246,7 @@ private fun GettingThere(venue: Venue) {
         venue.transport?.stations?.takeIf { it.isNotEmpty() }?.let { DetailRow(Icons.Filled.Train, it.joinToString(", ")) }
         venue.transport?.bus?.takeIf { it.isNotBlank() }?.let { DetailRow(Icons.Filled.DirectionsBus, it) }
         if (venue.location.isKnown) {
-            DetailRow(Icons.AutoMirrored.Filled.DirectionsWalk, stringResource(R.string.action_walking_directions), onClick = {
-                ExternalLinks.walkingDirections(context, venue)
-            })
+            WalkingDirectionsRow(venue, onShowMap)
             DetailRow(Icons.Filled.Map, stringResource(R.string.action_open_in_maps), onClick = {
                 ExternalLinks.openInMaps(context, venue)
             })

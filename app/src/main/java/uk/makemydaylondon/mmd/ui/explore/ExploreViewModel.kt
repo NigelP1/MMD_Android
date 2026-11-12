@@ -16,18 +16,22 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import uk.makemydaylondon.mmd.data.location.GeoPoint
 import uk.makemydaylondon.mmd.data.location.LocationService
+import uk.makemydaylondon.mmd.data.location.point
 import uk.makemydaylondon.mmd.data.model.London
 import uk.makemydaylondon.mmd.data.model.NearbyResponse
 import uk.makemydaylondon.mmd.data.model.Venue
 import uk.makemydaylondon.mmd.data.network.ApiException
 import uk.makemydaylondon.mmd.data.repository.MeRepository
 import uk.makemydaylondon.mmd.data.repository.VenueRepository
+import uk.makemydaylondon.mmd.data.routes.WalkingRoute
+import uk.makemydaylondon.mmd.data.routes.WalkingRouteStore
 import uk.makemydaylondon.mmd.data.session.SessionManager
 import uk.makemydaylondon.mmd.data.session.SessionState
 import uk.makemydaylondon.mmd.ui.common.LoadState
@@ -39,7 +43,7 @@ data class SearchKey(val center: GeoPoint, val date: LocalDate, val generation: 
 sealed interface CameraRequest {
     data class Centre(val point: GeoPoint) : CameraRequest
     /** Zoom out, if needed, so all the [points] are on screen */
-    data class Fit(val points: List<GeoPoint>) : CameraRequest
+    data class Fit(val points: List<GeoPoint>, val always: Boolean = false) : CameraRequest
 }
 
 /** Why "Near me" couldn't find the person */
@@ -59,6 +63,7 @@ class ExploreViewModel @Inject constructor(
     private val location: LocationService,
     session: SessionManager,
     me: MeRepository,
+    private val walking: WalkingRouteStore,
 ) : ViewModel() {
 
     /** The place name for the title, or null on the Explore tab */
@@ -105,8 +110,20 @@ class ExploreViewModel @Inject constructor(
 
     val hasLocationPermission: Boolean get() = location.hasPermission
 
+    /** A walking route asked for on a venue or event, drawn until cleared */
+    val walkingRoute: StateFlow<WalkingRoute?> = walking.route
+
+    fun clearWalkingRoute() = walking.clear()
+
     init {
         viewModelScope.launch { _search.collectLatest(::load) }
+        // Frame each new route
+        viewModelScope.launch {
+            walking.route.filterNotNull().distinctUntilChanged().collect { route ->
+                _selectedVenueId.value = null
+                cameraChannel.trySend(CameraRequest.Fit(route.leg.points, always = true))
+            }
+        }
         // Signed-in searches are filtered by the person's interests
         viewModelScope.launch {
             combine(
@@ -227,11 +244,3 @@ class ExploreViewModel @Inject constructor(
         fun shouldMove(from: GeoPoint, to: GeoPoint): Boolean = from.distanceTo(to) >= RELOAD_DISTANCE_M
     }
 }
-
-/** The venue's position, when the crawler knows it */
-val Venue.point: GeoPoint?
-    get() {
-        val latitude = location.latitude ?: return null
-        val longitude = location.longitude ?: return null
-        return GeoPoint(latitude, longitude)
-    }

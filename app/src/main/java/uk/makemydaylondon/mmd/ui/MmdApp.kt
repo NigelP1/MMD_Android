@@ -123,12 +123,27 @@ fun MmdApp(appViewModel: AppViewModel = hiltViewModel()) {
             }
         },
     ) {
-        MmdNavHost(navController, onShowWelcome = appViewModel::showWelcomeAgain)
+        MmdNavHost(
+            navController,
+            onShowWelcome = appViewModel::showWelcomeAgain,
+            // Walking directions are drawn on the Explore tab's map
+            onShowMap = {
+                if (currentTab != TopLevel.Explore) {
+                    currentTab = TopLevel.Explore
+                    navController.navigate(ExploreRoute) {
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                }
+                navController.popBackStack(ExploreRoute, inclusive = false)
+            },
+        )
     }
 }
 
 @Composable
-private fun MmdNavHost(navController: NavHostController, onShowWelcome: () -> Unit) {
+private fun MmdNavHost(navController: NavHostController, onShowWelcome: () -> Unit, onShowMap: () -> Unit) {
     val back: () -> Unit = { navController.popBackStack() }
     val openVenue = { id: Int -> navController.navigate(VenueRoute(id)) }
     val openVenueOn = { id: Int, date: java.time.LocalDate? -> navController.navigate(VenueRoute(id, date?.toString())) }
@@ -175,9 +190,10 @@ private fun MmdNavHost(navController: NavHostController, onShowWelcome: () -> Un
                 onBack = back,
                 onOpenEvent = { venueId, eventId -> navController.navigate(EventRoute(venueId, eventId, date)) },
                 onLogIn = logIn,
+                onShowMap = onShowMap,
             )
         }
-        composable<EventRoute> { EventScreen(onBack = back, onOpenVenue = openVenue, onLogIn = logIn) }
+        composable<EventRoute> { EventScreen(onBack = back, onOpenVenue = openVenue, onLogIn = logIn, onShowMap = onShowMap) }
 
         // Accounts
         composable<LoginRoute> { LoginScreen(onBack = back, actions = loginActions) }

@@ -1,6 +1,15 @@
 package uk.makemydaylondon.mmd.ui.explore
 
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.Color
+import com.google.android.gms.maps.model.JointType
+import com.google.android.gms.maps.model.RoundCap
+import com.google.maps.android.compose.Polyline
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
@@ -40,8 +49,12 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.isActive
 import uk.makemydaylondon.mmd.R
 import uk.makemydaylondon.mmd.data.location.GeoPoint
+import uk.makemydaylondon.mmd.data.location.point
 import uk.makemydaylondon.mmd.ui.common.LoadState
 import uk.makemydaylondon.mmd.ui.common.VenueBadge
+
+/** Google Maps' route blue */
+private val RouteColour = Color(0xFF1A73E8)
 
 /** About 2.5 km across on a phone: the usual "nearby" view */
 private const val NEARBY_ZOOM = 14.5f
@@ -63,6 +76,7 @@ fun VenueMap(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val tappedPoint by viewModel.tappedPoint.collectAsStateWithLifecycle()
     val selectedId by viewModel.selectedVenueId.collectAsStateWithLifecycle()
+    val walk by viewModel.walkingRoute.collectAsStateWithLifecycle()
     val fitPaddingPx = with(LocalDensity.current) { 64.dp.roundToPx() }
 
     // Searches follow the person's panning, not the app's own camera moves
@@ -82,7 +96,7 @@ fun VenueMap(
                 is CameraRequest.Centre -> cameraState.animateSafely(CameraUpdateFactory.newLatLngZoom(request.point.latLng, NEARBY_ZOOM))
                 is CameraRequest.Fit -> {
                     val visible = cameraState.projection?.visibleRegion?.latLngBounds
-                    if (visible == null || request.points.any { !visible.contains(it.latLng) }) {
+                    if (request.always || visible == null || request.points.any { !visible.contains(it.latLng) }) {
                         val bounds = LatLngBounds.builder().apply { request.points.forEach { include(it.latLng) } }.build()
                         cameraState.animateSafely(CameraUpdateFactory.newLatLngBounds(bounds, fitPaddingPx))
                     }
@@ -99,48 +113,85 @@ fun VenueMap(
     val context = LocalContext.current
     val mapStyle = remember { MapStyleOptions.loadRawResourceStyle(context, R.raw.map_style) }
 
-    GoogleMap(
-        modifier = modifier,
-        cameraPositionState = cameraState,
-        contentPadding = contentPadding,
-        // Google's own place pins would be confused with the venues'
-        properties = MapProperties(isMyLocationEnabled = showsMyLocation, mapStyleOptions = mapStyle),
-        uiSettings = MapUiSettings(myLocationButtonEnabled = false, mapToolbarEnabled = false, zoomControlsEnabled = false),
-        mapColorScheme = ComposeMapColorScheme.FOLLOW_SYSTEM,
-        onMapClick = { viewModel.searchHere(it.geoPoint) },
-    ) {
-        tappedPoint?.let { point ->
-            Marker(
-                state = rememberUpdatedMarkerState(point.latLng),
-                title = searchHereTitle,
-                icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE),
-                alpha = 0.8f,
-            )
-        }
-        venues.forEach { venue ->
-            val point = venue.point ?: return@forEach
-            val selected = venue.id == selectedId
-            key(venue.id) {
-                MarkerComposable(
-                    venue.id, venue.hasEvents, selected,
+    Box(modifier) {
+        GoogleMap(
+            modifier = Modifier.fillMaxSize(),
+            cameraPositionState = cameraState,
+            contentPadding = contentPadding,
+            // Google's own place pins would be confused with the venues'
+            properties = MapProperties(isMyLocationEnabled = showsMyLocation, mapStyleOptions = mapStyle),
+            uiSettings = MapUiSettings(myLocationButtonEnabled = false, mapToolbarEnabled = false, zoomControlsEnabled = false),
+            mapColorScheme = ComposeMapColorScheme.FOLLOW_SYSTEM,
+            onMapClick = { viewModel.searchHere(it.geoPoint) },
+        ) {
+            tappedPoint?.let { point ->
+                Marker(
                     state = rememberUpdatedMarkerState(point.latLng),
-                    title = venue.name,
-                    // Pins with events above the rest, the tapped one above all
-                    zIndex = if (selected) 2f else if (venue.hasEvents) 1f else 0f,
-                    onClick = {
-                        viewModel.select(venue.id)
-                        true // no info window: the list shows the venue
-                    },
-                ) {
-                    val size = if (selected) 40.dp else 30.dp
-                    VenueBadge(
-                        venue.type,
-                        venue.hasEvents,
-                        size = size,
-                        modifier = Modifier.border(2.dp, MaterialTheme.colorScheme.surface, CircleShape),
-                    )
+                    title = searchHereTitle,
+                    icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE),
+                    alpha = 0.8f,
+                )
+            }
+            walk?.let { route ->
+                Polyline(
+                    points = remember(route) { route.leg.points.map { it.latLng } },
+                    color = RouteColour,
+                    width = with(LocalDensity.current) { 6.dp.toPx() },
+                    jointType = JointType.ROUND,
+                    startCap = RoundCap(),
+                    endCap = RoundCap(),
+                )
+                // The destination, if it isn't among the nearby pins
+                val destination = route.destination
+                val point = destination.point
+                if (point != null && venues.none { it.id == destination.id }) {
+                    key("route-${destination.id}") {
+                        MarkerComposable(
+                            destination.id,
+                            state = rememberUpdatedMarkerState(point.latLng),
+                            title = destination.name,
+                            zIndex = 2f,
+                        ) {
+                            VenueBadge(destination.type, hasEvents = true, size = 36.dp, modifier = Modifier.border(2.dp, MaterialTheme.colorScheme.surface, CircleShape))
+                        }
+                    }
                 }
             }
+            venues.forEach { venue ->
+                val point = venue.point ?: return@forEach
+                val selected = venue.id == selectedId
+                key(venue.id) {
+                    MarkerComposable(
+                        venue.id, venue.hasEvents, selected,
+                        state = rememberUpdatedMarkerState(point.latLng),
+                        title = venue.name,
+                        // Pins with events above the rest, the tapped one above all
+                        zIndex = if (selected) 2f else if (venue.hasEvents) 1f else 0f,
+                        onClick = {
+                            viewModel.select(venue.id)
+                            true // no info window: the list shows the venue
+                        },
+                    ) {
+                        val size = if (selected) 40.dp else 30.dp
+                        VenueBadge(
+                            venue.type,
+                            venue.hasEvents,
+                            size = size,
+                            modifier = Modifier.border(2.dp, MaterialTheme.colorScheme.surface, CircleShape),
+                        )
+                    }
+                }
+            }
+        }
+        walk?.let { route ->
+            WalkingRouteBanner(
+                route = route,
+                onClose = viewModel::clearWalkingRoute,
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .padding(top = contentPadding.calculateTopPadding() + 8.dp, start = 12.dp, end = 12.dp)
+                    .widthIn(max = 480.dp),
+            )
         }
     }
 }

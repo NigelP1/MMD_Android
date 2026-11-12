@@ -19,6 +19,7 @@ import kotlin.math.sin
 import kotlin.math.sqrt
 import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.coroutines.tasks.await
+import uk.makemydaylondon.mmd.data.model.Venue
 
 /** A point on the map */
 data class GeoPoint(val latitude: Double, val longitude: Double) {
@@ -42,6 +43,14 @@ data class GeoPoint(val latitude: Double, val longitude: Double) {
         const val LONDON_RADIUS_M = 40_000.0
     }
 }
+
+/** The venue's position, when the crawler knows it */
+val Venue.point: GeoPoint?
+    get() {
+        val latitude = location.latitude ?: return null
+        val longitude = location.longitude ?: return null
+        return GeoPoint(latitude, longitude)
+    }
 
 /** The person's location, when they've allowed it. */
 @Singleton

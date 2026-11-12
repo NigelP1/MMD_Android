@@ -2,6 +2,7 @@ package uk.makemydaylondon.mmd.ui.explore
 
 import android.content.Intent
 import android.provider.Settings
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
@@ -174,6 +175,11 @@ fun ExploreScreen(
             val peekHeight: Dp = maxHeight * 0.42f
             val sheetState = rememberStandardBottomSheetState(initialValue = SheetValue.PartiallyExpanded, skipHiddenState = true)
             val scaffoldState = rememberBottomSheetScaffoldState(sheetState)
+            // Make room for a new walking route
+            val walk by viewModel.walkingRoute.collectAsStateWithLifecycle()
+            LaunchedEffect(walk) {
+                if (walk != null && sheetState.currentValue == SheetValue.Expanded) sheetState.partialExpand()
+            }
             BottomSheetScaffold(
                 scaffoldState = scaffoldState,
                 sheetPeekHeight = peekHeight,
@@ -193,6 +199,10 @@ fun ExploreScreen(
             }
         }
     }
+
+    // Back clears a walking route before leaving the map
+    val walkingRoute by viewModel.walkingRoute.collectAsStateWithLifecycle()
+    BackHandler(enabled = walkingRoute != null, onBack = viewModel::clearWalkingRoute)
 
     // A tapped pin's venue goes to the top of the list
     val selectedId by viewModel.selectedVenueId.collectAsStateWithLifecycle()

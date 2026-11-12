@@ -1,32 +1,217 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Onglets -->
     <string name="tab_explore">Explorer</string>
     <string name="tab_search">Rechercher</string>
     <string name="tab_my_day">Ma journée</string>
     <string name="tab_account">Compte</string>
-    <string name="coming_soon">Bientôt disponible</string>
 
-    <string name="explore_title">Près de Trafalgar Square aujourd\'hui</string>
-    <string name="explore_with_events">Avec des événements aujourd\'hui</string>
-    <string name="explore_without_events">Autres lieux à proximité</string>
-    <string name="distance_metres">%d m</string>
-    <plurals name="event_count">
-        <item quantity="one">%d événement</item>
-        <item quantity="many">%d événements</item>
-        <item quantity="other">%d événements</item>
-    </plurals>
-
-    <string name="login_title">Connexion</string>
-    <string name="field_email">E-mail</string>
-    <string name="field_password">Mot de passe</string>
-    <string name="action_log_in">Se connecter</string>
-    <string name="action_log_out">Se déconnecter</string>
+    <!-- Actions courantes -->
+    <string name="action_add">Ajouter</string>
+    <string name="action_back">Retour</string>
+    <string name="action_cancel">Annuler</string>
+    <string name="action_clear">Effacer</string>
+    <string name="action_more">Plus d’options</string>
+    <string name="action_next">Suivant</string>
+    <string name="action_ok">OK</string>
+    <string name="action_send">Envoyer</string>
+    <string name="action_share">Partager</string>
+    <string name="action_skip">Passer</string>
     <string name="action_try_again">Réessayer</string>
 
+    <!-- Dates -->
+    <string name="day_today">Aujourd’hui</string>
+    <string name="day_tomorrow">Demain</string>
+
+    <!-- Explorer -->
+    <string name="explore_title">Près de Trafalgar Square aujourd’hui</string>
+    <string name="nearby_title">Près de %1$s aujourd’hui</string>
+    <string name="explore_with_events">Événements du jour</string>
+    <string name="explore_without_events">Également à proximité</string>
+    <string name="explore_filtered">Lieux correspondant à vos centres d’intérêt.</string>
+    <plurals name="events_and_more">
+        <item quantity="one">%1$s et %2$d autre</item>
+        <item quantity="many">%1$s et %2$d autres</item>
+        <item quantity="other">%1$s et %2$d autres</item>
+    </plurals>
+
+    <!-- Lieu -->
+    <string name="section_about">À propos</string>
+    <string name="section_getting_there">Accès</string>
+    <string name="section_upcoming_events">Événements à venir</string>
+    <string name="section_venue">Lieu</string>
+    <string name="venue_in_my_day">Dans Ma journée : %1$s</string>
+    <string name="venue_log_in_to_plan">Connectez-vous pour planifier votre journée.</string>
+    <string name="venue_no_events">Aucun événement annoncé pour le moment. Consultez le site web du lieu.</string>
+    <string name="action_add_to_my_day">Ajouter à Ma journée</string>
+    <string name="action_add_another_day">Ajouter à un autre jour</string>
+    <string name="action_remove_from_my_day">Retirer de Ma journée</string>
+    <string name="action_visit_website">Consulter le site web</string>
+    <string name="action_walking_directions">Itinéraire à pied</string>
+    <string name="action_open_in_maps">Ouvrir dans Maps</string>
+    <string name="facility_access">Accès</string>
+    <string name="facility_access_description">Accès de plain-pied</string>
+    <string name="facility_free">Gratuit</string>
+    <string name="facility_free_description">Entrée gratuite</string>
+    <string name="facility_wifi">Wi-Fi</string>
+    <string name="facility_cafe">Café</string>
+
+    <!-- Événement -->
+    <string name="action_save">Enregistrer</string>
+    <string name="event_saved">Enregistré</string>
+    <string name="event_in_my_day">Dans Ma journée</string>
+    <string name="event_log_in_to_save">Connectez-vous pour enregistrer des événements et planifier votre journée. Nous vous enverrons un e-mail avant la fin des événements enregistrés.</string>
+    <string name="action_event_website">Site web de l’événement</string>
+    <string name="action_add_to_calendar">Ajouter à l’agenda</string>
+    <string name="event_share_summary">%1$s à %2$s, %3$s</string>
+
+    <!-- Recherche -->
+    <string name="search_placeholder">Lieux, stations ou événements</string>
+    <string name="search_hint">Recherchez un lieu, une station ou un quartier, ou des événements par mot-clé.</string>
+    <string name="search_events_for">Rechercher « %1$s » dans les événements</string>
+    <string name="search_venues">Lieux</string>
+    <string name="search_stations">Stations</string>
+    <string name="search_searching">Recherche en cours…</string>
+    <string name="search_no_results">Aucun résultat pour « %1$s »</string>
+    <string name="search_no_results_hint">Vérifiez l’orthographe ou essayez un autre mot.</string>
+
+    <!-- Ma journée et événements enregistrés -->
+    <string name="saved_title">Enregistrés</string>
+    <string name="saved_signed_out_title">Enregistrez des événements pour plus tard</string>
+    <string name="saved_signed_out_message">Connectez-vous pour enregistrer des événements, planifier votre journée et recevoir un rappel avant leur fin.</string>
+    <string name="saved_load_failed">Impossible de charger vos événements</string>
+    <string name="saved_empty_title">Aucun événement enregistré</string>
+    <string name="saved_empty_message">Ouvrez un événement et appuyez sur « Enregistrer ».</string>
+    <string name="my_day_empty_title">Rien de prévu pour l’instant</string>
+    <string name="my_day_empty_message">Ouvrez un événement ou un lieu et appuyez sur « Ajouter à Ma journée ».</string>
+    <string name="action_unsave">Retirer des enregistrés</string>
+
+    <!-- Connexion et comptes -->
+    <string name="login_title">Connexion</string>
+    <string name="login_intro">Connectez-vous pour enregistrer des événements, planifier votre journée et recevoir des rappels.</string>
+    <string name="field_email">E-mail</string>
+    <string name="field_password">Mot de passe</string>
+    <string name="field_new_password">Nouveau mot de passe</string>
+    <string name="field_first_name">Prénom</string>
+    <string name="field_last_name_optional">Nom (facultatif)</string>
+    <string name="field_code">Code à 6 chiffres</string>
+    <string name="action_log_in">Se connecter</string>
+    <string name="action_log_out">Se déconnecter</string>
+    <string name="action_log_out_everywhere">Se déconnecter de tous les appareils</string>
+    <string name="action_forgot_password">Mot de passe oublié ?</string>
+    <string name="action_create_account">Créer un compte</string>
+    <string name="action_show_password">Afficher le mot de passe</string>
+    <string name="action_hide_password">Masquer le mot de passe</string>
+    <string name="action_send_code">Envoyer le code</string>
+    <string name="action_send_new_code">Envoyer un nouveau code</string>
+    <string name="action_confirm">Confirmer</string>
+    <string name="action_set_new_password">Définir le nouveau mot de passe</string>
+    <string name="register_title">Créer un compte</string>
+    <string name="register_password_help">Au moins 8 caractères. Nous vous enverrons un code par e-mail pour confirmer votre adresse.</string>
+    <string name="forgot_password_title">Mot de passe oublié</string>
+    <string name="forgot_password_help">Nous vous enverrons un code par e-mail pour définir un nouveau mot de passe.</string>
+    <string name="verify_email_title">Confirmez votre adresse e-mail</string>
+    <string name="reset_password_title">Nouveau mot de passe</string>
+    <string name="code_sent_to">Envoyé à %1$s</string>
+    <string name="code_help_verify">Consultez vos e-mails pour obtenir le code. Il peut mettre une minute à arriver.</string>
+    <string name="code_help_reset">Consultez vos e-mails pour obtenir le code. Le nouveau mot de passe doit comporter au moins 8 caractères.</string>
+    <string name="password_changed_title">Mot de passe modifié</string>
+    <string name="log_out_everywhere_title">Se déconnecter de tous les appareils ?</string>
+    <string name="log_out_everywhere_message">Vous devrez vous reconnecter sur cet appareil et sur tous les autres.</string>
+
+    <!-- Centres d’intérêt -->
+    <string name="interests_menu">Centres d’intérêt et e-mails</string>
+    <string name="interests_title">Centres d’intérêt</string>
+    <string name="interests_header">Qu’aimez-vous ?</string>
+    <string name="interests_footer">Utilisés pour l’e-mail hebdomadaire des nouveaux événements et, si vous le souhaitez, pour filtrer la carte.</string>
+    <string name="interests_only_mine">Afficher uniquement mes centres d’intérêt</string>
+    <string name="interests_only_mine_help">La carte affiche uniquement les lieux correspondant à vos centres d’intérêt.</string>
+    <string name="interests_only_mine_none">Choisissez d’abord des centres d’intérêt.</string>
+    <string name="emails_header">E-mails</string>
+    <string name="emails_new_events">Nouveaux événements</string>
+    <string name="emails_new_events_help">Le lundi, des événements correspondant à vos centres d’intérêt</string>
+    <string name="emails_ending_soon">Bientôt terminés</string>
+    <string name="emails_ending_soon_help">À 8 h, lorsqu’un événement enregistré est sur le point de se terminer</string>
+    <string name="interest_art">Galeries d’art</string>
+    <string name="interest_museums">Musées</string>
+    <string name="interest_theatre">Théâtre</string>
+    <string name="interest_cinema">Cinéma</string>
+    <string name="interest_landmarks">Monuments et histoire</string>
+    <string name="interest_music">Concerts et musique live</string>
+    <string name="interest_nightlife">Vie nocturne</string>
+    <string name="interest_sport">Sport</string>
+    <string name="interest_special_events">Événements spéciaux</string>
+    <string name="interest_markets">Marchés</string>
+    <string name="interest_outdoors">Parcs, balades et faune sauvage</string>
+    <string name="interest_food">Cuisine et boissons</string>
+
+    <!-- Suppression du compte -->
+    <string name="delete_account_title">Supprimer le compte</string>
+    <string name="delete_account_warning">Cette action supprime définitivement votre compte, vos centres d’intérêt, vos événements enregistrés et Ma journée, et vous déconnecte sur tous vos appareils. Elle est irréversible.</string>
+    <string name="delete_with_password">Mot de passe</string>
+    <string name="delete_with_code">Code par e-mail</string>
+    <string name="delete_with_code_help">Utilisez un code envoyé par e-mail si vous vous connectez avec Google ou une clé d’accès.</string>
+    <string name="delete_code_will_be_sent">Nous l’enverrons à %1$s.</string>
+    <string name="action_email_me_a_code">M’envoyer un code par e-mail</string>
+    <string name="delete_confirm_title">Supprimer votre compte ?</string>
+    <string name="delete_confirm_message">Vos événements enregistrés et vos réglages seront supprimés. Cette action est irréversible.</string>
+    <string name="deleted_title">Compte supprimé</string>
+    <string name="deleted_message">Votre compte et toutes ses données ont été supprimés, et votre session a été fermée.</string>
+
+    <!-- Infos -->
+    <string name="info_title">Infos</string>
+    <string name="info_news">Actualités</string>
+    <string name="info_about">À propos de Make My Day</string>
+    <string name="info_privacy">Confidentialité</string>
+    <string name="info_disclaimer">Avertissement</string>
+    <string name="info_credits">Crédits</string>
+    <string name="info_show_welcome">Afficher les conseils de bienvenue</string>
+    <string name="info_version">Make My Day %1$s</string>
+
+    <!-- Contact -->
+    <string name="contact_menu">Contact et suggestions</string>
+    <string name="contact_title">Nous contacter</string>
+    <string name="field_your_name">Votre nom</string>
+    <string name="field_topic">Sujet</string>
+    <string name="field_message">Message</string>
+    <string name="contact_email_help">Nous vous répondrons à cette adresse. Elle n’est utilisée que pour cela.</string>
+    <string name="contact_length" tools:ignore="PluralsCandidate">%1$d sur %2$d caractères</string>
+    <string name="contact_sent_title">Message envoyé</string>
+    <string name="topic_question">Question</string>
+    <string name="topic_suggestion">Suggestion</string>
+    <string name="topic_venue">Correction d’un lieu ou d’un événement</string>
+    <string name="topic_problem">Problème avec l’app</string>
+    <string name="topic_other">Autre sujet</string>
+    <string name="prompt_question">Comment pouvons-nous vous aider ?</string>
+    <string name="prompt_suggestion">Un lieu que nous devrions ajouter, ou une idée pour l’app</string>
+    <string name="prompt_venue">Quel lieu ou événement, et que faut-il modifier ?</string>
+    <string name="prompt_problem">Que s’est-il passé et à quoi vous attendiez-vous ?</string>
+
+    <!-- Bienvenue -->
+    <string name="welcome1_title">Bienvenue dans Make My Day</string>
+    <string name="welcome1_intro">Découvrez des lieux intéressants et insolites à visiter à Londres, ainsi que les événements qui s’y déroulent.</string>
+    <string name="welcome1_tip1">La carte affiche les lieux à proximité. Les épingles colorées signalent des événements le jour consulté ; les épingles grises n’en ont pas.</string>
+    <string name="welcome1_tip2">Choisissez une date en haut de la liste pour voir les événements à venir.</string>
+    <string name="welcome1_tip3">Enregistrez des événements, planifiez votre journée et recevez un rappel avant leur fin.</string>
+    <string name="welcome2_title">Découvrez les événements</string>
+    <string name="welcome2_intro">Explorez les alentours, où que vous soyez ou où que vous alliez.</string>
+    <string name="welcome2_tip1">« À proximité » affiche les lieux et les événements autour de vous.</string>
+    <string name="welcome2_tip2">Appuyez n’importe où sur la carte pour voir ce qui se trouve autour.</string>
+    <string name="welcome2_tip3">Recherchez un lieu ou une station, ou recherchez des événements par mot-clé.</string>
+    <string name="welcome3_title">Planifiez votre journée</string>
+    <string name="welcome3_intro">Ouvrez un événement pour en profiter pleinement.</string>
+    <string name="welcome3_tip1">Enregistrez-le ou ajoutez-le à Ma journée. Connectez-vous avec Google, une clé d’accès ou votre adresse e-mail.</string>
+    <string name="welcome3_tip2">Ajoutez-le à votre agenda ou partagez-le avec vos amis.</string>
+    <string name="welcome3_tip3">Obtenez un itinéraire à pied jusqu’au lieu. Idéal lorsque vous êtes à proximité.</string>
+    <string name="action_start_exploring">Commencer l’exploration</string>
+
+    <!-- Erreurs -->
     <string name="error_offline">Vous semblez être hors ligne. Vérifiez votre connexion et réessayez.</string>
     <string name="error_unauthorized">Veuillez vous reconnecter.</string>
-    <string name="error_not_found">Introuvable.</string>
-    <string name="error_rate_limited">Trop de tentatives. Veuillez réessayer plus tard.</string>
-    <string name="error_validation">Veuillez vérifier les informations et réessayer.</string>
-    <string name="error_generic">Une erreur s\'est produite. Veuillez réessayer plus tard.</string>
+    <string name="error_not_found">Élément introuvable.</string>
+    <string name="error_rate_limited">Trop de tentatives. Réessayez plus tard.</string>
+    <string name="error_validation">Vérifiez les informations saisies et réessayez.</string>
+    <string name="error_generic">Une erreur s’est produite. Veuillez réessayer plus tard.</string>
+    <string name="error_update_title">Mise à jour impossible</string>
+    <string name="error_no_app">Aucune application de cet appareil ne peut ouvrir ce contenu.</string>
 </resources>

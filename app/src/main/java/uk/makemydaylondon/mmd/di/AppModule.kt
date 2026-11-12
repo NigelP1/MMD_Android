@@ -26,6 +26,11 @@ import uk.makemydaylondon.mmd.data.session.TokenStore
 @Retention(AnnotationRetention.BINARY)
 annotation class ApplicationScope
 
+/** The DataStore for [uk.makemydaylondon.mmd.data.settings.AppSettings] (the unqualified one holds the session) */
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class SettingsStore
+
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
@@ -40,6 +45,12 @@ object AppModule {
     @Singleton
     fun sessionDataStore(@ApplicationContext context: Context): DataStore<Preferences> =
         PreferenceDataStoreFactory.create { context.preferencesDataStoreFile("session") }
+
+    @Provides
+    @Singleton
+    @SettingsStore
+    fun settingsDataStore(@ApplicationContext context: Context): DataStore<Preferences> =
+        PreferenceDataStoreFactory.create { context.preferencesDataStoreFile("settings") }
 }
 
 @Module

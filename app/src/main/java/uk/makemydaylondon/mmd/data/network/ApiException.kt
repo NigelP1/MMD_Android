@@ -21,7 +21,7 @@ sealed class ApiException(val serverMessage: String? = null) : Exception(serverM
     /** 401: the token is missing, expired or revoked */
     class Unauthorized : ApiException()
 
-    /** 403, e.g. logging in before verifying the email address ([code] "email_not_verified") */
+    /** 403, e.g. logging in before verifying the email address ([code] "email_unverified") */
     class Forbidden(message: String?, val code: String?) : ApiException(message)
 
     /** 404 */

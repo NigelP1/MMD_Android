@@ -51,15 +51,3 @@ fun ErrorMessage(error: ApiException, onRetry: (() -> Unit)?, modifier: Modifier
         }
     }
 }
-
-@Composable
-fun ComingSoon(@StringRes title: Int, modifier: Modifier = Modifier) {
-    Column(
-        modifier = modifier.fillMaxSize().padding(24.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Text(stringResource(title), style = MaterialTheme.typography.headlineSmall)
-        Text(stringResource(R.string.coming_soon), style = MaterialTheme.typography.bodyMedium)
-    }
-}

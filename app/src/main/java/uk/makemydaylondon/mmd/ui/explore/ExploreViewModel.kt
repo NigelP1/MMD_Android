@@ -1,5 +1,6 @@
 package uk.makemydaylondon.mmd.ui.explore
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -14,13 +15,21 @@ import uk.makemydaylondon.mmd.data.repository.VenueRepository
 import uk.makemydaylondon.mmd.ui.common.LoadState
 
 /**
- * Phase 1: venues near Trafalgar Square today, to prove the data layer
- * end to end. Phase 2 replaces this with the map and the user's location.
+ * Venues around a point today: Trafalgar Square on the Explore tab, or the
+ * point in a [uk.makemydaylondon.mmd.ui.NearbyRoute] (e.g. a station chosen
+ * in search). The map and the user's location replace this once the Maps
+ * key is in place.
  */
 @HiltViewModel
 class ExploreViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
     private val venues: VenueRepository,
 ) : ViewModel() {
+
+    /** The place name for the title, or null for the default spot */
+    val placeName: String? = savedStateHandle["name"]
+    private val latitude: Double = savedStateHandle["latitude"] ?: TRAFALGAR_SQUARE_LAT
+    private val longitude: Double = savedStateHandle["longitude"] ?: TRAFALGAR_SQUARE_LNG
 
     private val _state = MutableStateFlow<LoadState<NearbyResponse>>(LoadState.Loading)
     val state: StateFlow<LoadState<NearbyResponse>> = _state.asStateFlow()
@@ -36,7 +45,7 @@ class ExploreViewModel @Inject constructor(
         viewModelScope.launch {
             if (isRefresh) _refreshing.value = true else _state.value = LoadState.Loading
             _state.value = try {
-                LoadState.Loaded(venues.nearby(TRAFALGAR_SQUARE_LAT, TRAFALGAR_SQUARE_LNG))
+                LoadState.Loaded(venues.nearby(latitude, longitude))
             } catch (e: ApiException) {
                 LoadState.Failed(e)
             }

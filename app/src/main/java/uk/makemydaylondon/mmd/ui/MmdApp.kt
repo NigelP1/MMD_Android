@@ -131,10 +131,15 @@ fun MmdApp(appViewModel: AppViewModel = hiltViewModel()) {
 private fun MmdNavHost(navController: NavHostController, onShowWelcome: () -> Unit) {
     val back: () -> Unit = { navController.popBackStack() }
     val openVenue = { id: Int -> navController.navigate(VenueRoute(id)) }
+    val openVenueOn = { id: Int, date: java.time.LocalDate? -> navController.navigate(VenueRoute(id, date?.toString())) }
     val openEvent = { venueId: Int, eventId: Int -> navController.navigate(EventRoute(venueId, eventId)) }
     val logIn = { navController.navigate(LoginRoute) { launchSingleTop = true } }
     val loginActions = LoginActions(
         onLoggedIn = navController::finishSignIn,
+        onNewAccount = {
+            navController.finishSignIn()
+            navController.navigate(InterestsRoute)
+        },
         onNeedsVerification = { navController.navigate(EmailCodeRoute(it, CodePurpose.VerifyEmail)) },
         onForgotPassword = { navController.navigate(ForgotPasswordRoute(it)) },
         onRegister = { navController.navigate(RegisterRoute) },
@@ -143,7 +148,7 @@ private fun MmdNavHost(navController: NavHostController, onShowWelcome: () -> Un
     NavHost(navController, startDestination = ExploreRoute) {
         // Tabs
         composable<ExploreRoute> {
-            ExploreScreen(onOpenVenue = openVenue, onOpenInfo = { navController.navigate(InfoRoute) })
+            ExploreScreen(onOpenVenue = openVenueOn, onOpenInfo = { navController.navigate(InfoRoute) })
         }
         composable<SearchRoute> {
             SearchScreen(
@@ -163,7 +168,7 @@ private fun MmdNavHost(navController: NavHostController, onShowWelcome: () -> Un
         }
 
         // Venues and events
-        composable<NearbyRoute> { ExploreScreen(onOpenVenue = openVenue, onBack = back) }
+        composable<NearbyRoute> { ExploreScreen(onOpenVenue = openVenueOn, onBack = back) }
         composable<VenueRoute> { entry ->
             val date = entry.toRoute<VenueRoute>().date
             VenueScreen(

@@ -1,6 +1,18 @@
 package uk.makemydaylondon.mmd.ui.account
 
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.Icon
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.HorizontalDivider
@@ -36,6 +48,8 @@ import uk.makemydaylondon.mmd.ui.common.SubmitButton
 /** Where the login form can lead */
 class LoginActions(
     val onLoggedIn: () -> Unit,
+    /** After Google sign-in created the account */
+    val onNewAccount: () -> Unit,
     val onNeedsVerification: (email: String) -> Unit,
     val onForgotPassword: (email: String) -> Unit,
     val onRegister: () -> Unit,
@@ -62,6 +76,7 @@ fun ColumnScope.LoginForm(actions: LoginActions, viewModel: LoginViewModel = hil
     LaunchedEffect(outcome) {
         when (val o = outcome) {
             LoginOutcome.LoggedIn -> actions.onLoggedIn()
+            LoginOutcome.NewAccount -> actions.onNewAccount()
             is LoginOutcome.NeedsVerification -> actions.onNeedsVerification(o.email)
             null -> return@LaunchedEffect
         }
@@ -70,6 +85,13 @@ fun ColumnScope.LoginForm(actions: LoginActions, viewModel: LoginViewModel = hil
     }
 
     Text(stringResource(R.string.login_intro), color = MaterialTheme.colorScheme.onSurfaceVariant)
+    GoogleButton(busy = busy, onToken = viewModel::signInWithGoogle, onPickerOpened = viewModel::clearError)
+    Text(
+        stringResource(R.string.login_or_email),
+        style = MaterialTheme.typography.labelLarge,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        modifier = Modifier.align(Alignment.CenterHorizontally),
+    )
     FormField(
         value = email,
         onValueChange = { email = it },
@@ -94,6 +116,39 @@ fun ColumnScope.LoginForm(actions: LoginActions, viewModel: LoginViewModel = hil
     OutlinedButton(onClick = actions.onRegister, modifier = Modifier.fillMaxWidth()) {
         Text(stringResource(R.string.action_create_account))
     }
+}
+
+/** "Continue with Google": opens Google's account picker, then hands the token to [onToken]. */
+@Composable
+private fun GoogleButton(busy: Boolean, onToken: (GoogleCredential.Token) -> Unit, onPickerOpened: () -> Unit) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    var picking by remember { mutableStateOf(false) }
+    var problem by rememberSaveable { mutableStateOf<Int?>(null) }
+
+    OutlinedButton(
+        onClick = {
+            problem = null
+            onPickerOpened()
+            picking = true
+            scope.launch {
+                when (val result = GoogleSignIn.request(context)) {
+                    is GoogleCredential.Token -> onToken(result)
+                    GoogleCredential.Cancelled -> Unit
+                    GoogleCredential.NoAccount -> problem = R.string.google_no_account
+                    GoogleCredential.Failed -> problem = R.string.google_failed
+                }
+                picking = false
+            }
+        },
+        enabled = !busy && !picking,
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Icon(painterResource(R.drawable.ic_google), contentDescription = null, tint = Color.Unspecified, modifier = Modifier.size(18.dp))
+        Spacer(Modifier.width(12.dp))
+        Text(stringResource(R.string.action_continue_with_google))
+    }
+    problem?.let { Text(stringResource(it), color = MaterialTheme.colorScheme.error) }
 }
 
 @Composable

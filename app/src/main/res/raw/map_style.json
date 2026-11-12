@@ -1,0 +1,4 @@
+[
+  { "featureType": "poi", "elementType": "labels.icon", "stylers": [{ "visibility": "off" }] },
+  { "featureType": "poi.business", "stylers": [{ "visibility": "off" }] }
+]

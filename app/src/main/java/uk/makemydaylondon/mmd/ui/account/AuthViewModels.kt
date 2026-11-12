@@ -22,6 +22,8 @@ import uk.makemydaylondon.mmd.ui.common.MIN_PASSWORD_LENGTH
 
 sealed interface LoginOutcome {
     data object LoggedIn : LoginOutcome
+    /** Signed in with Google for the first time: worth offering the interests screen */
+    data object NewAccount : LoginOutcome
     /** Right password, but the address was never confirmed: a fresh code has been sent */
     data class NeedsVerification(val email: String) : LoginOutcome
 }
@@ -40,6 +42,14 @@ class LoginViewModel @Inject constructor(private val auth: AuthRepository) : For
                 runCatching { auth.resendVerification(email) }
                 LoginOutcome.NeedsVerification(email.trim())
             }
+        }
+    }
+
+    /** A 409 here means the address already has a password account: the server's message says so */
+    fun signInWithGoogle(token: GoogleCredential.Token) {
+        submit {
+            val response = auth.signInWithGoogle(token.idToken, token.nonce)
+            if (response.created) LoginOutcome.NewAccount else LoginOutcome.LoggedIn
         }
     }
 

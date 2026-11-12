@@ -1,5 +1,9 @@
 package uk.makemydaylondon.mmd.data.repository
 
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import android.os.Build
 import java.time.LocalDate
 import javax.inject.Inject
@@ -22,9 +26,14 @@ import uk.makemydaylondon.mmd.data.network.apiCall
 @Singleton
 class MeRepository @Inject constructor(private val api: MmdApi) {
 
+    /** Bumped after each profile change, so nearby searches (filtered by interests) can reload */
+    private val _profileRevision = MutableStateFlow(0)
+    val profileRevision: StateFlow<Int> = _profileRevision.asStateFlow()
+
     suspend fun profile(): Profile = apiCall { api.profile() }.data
 
-    suspend fun updateProfile(profile: Profile): Profile = apiCall { api.updateProfile(profile) }.data
+    suspend fun updateProfile(profile: Profile): Profile =
+        apiCall { api.updateProfile(profile) }.data.also { _profileRevision.update { it + 1 } }
 
     /** Saved events that haven't finished, soonest first */
     suspend fun savedEvents(myDayOnly: Boolean = false, includePast: Boolean = false): List<SavedEvent> =

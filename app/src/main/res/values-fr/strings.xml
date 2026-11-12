@@ -24,11 +24,21 @@
     <string name="day_tomorrow">Demain</string>
 
     <!-- Explorer -->
-    <string name="explore_title">Près de Trafalgar Square aujourd’hui</string>
-    <string name="nearby_title">Près de %1$s aujourd’hui</string>
-    <string name="explore_with_events">Événements du jour</string>
+    <string name="explore_title">Make My Day</string>
+    <string name="nearby_title">Près de %1$s</string>
+    <string name="explore_with_events">Avec des événements</string>
     <string name="explore_without_events">Également à proximité</string>
     <string name="explore_filtered">Lieux correspondant à vos centres d’intérêt.</string>
+    <string name="explore_selected">Sélectionné</string>
+    <string name="explore_no_events">Aucun événement à proximité ce jour-là.</string>
+    <string name="action_near_me">À proximité</string>
+    <string name="action_close">Fermer</string>
+    <string name="action_open_settings">Ouvrir les paramètres</string>
+    <string name="map_search_here">Point de recherche</string>
+    <string name="location_denied_title">Position désactivée</string>
+    <string name="location_denied_message">Pour trouver des lieux à proximité, autorisez Make My Day à utiliser votre position dans les paramètres.</string>
+    <string name="location_unavailable_title">Impossible de trouver votre position</string>
+    <string name="location_unavailable_message">Veuillez réessayer dans un instant.</string>
     <plurals name="events_and_more">
         <item quantity="one">%1$s et %2$d autre</item>
         <item quantity="many">%1$s et %2$d autres</item>
@@ -89,6 +99,10 @@
     <!-- Connexion et comptes -->
     <string name="login_title">Connexion</string>
     <string name="login_intro">Connectez-vous pour enregistrer des événements, planifier votre journée et recevoir des rappels.</string>
+    <string name="action_continue_with_google">Continuer avec Google</string>
+    <string name="login_or_email">ou utilisez votre e-mail</string>
+    <string name="google_no_account">Aucun compte Google sur cet appareil. Ajoutez-en un dans les Paramètres, ou connectez-vous avec votre e-mail.</string>
+    <string name="google_failed">La connexion avec Google a échoué. Réessayez, ou connectez-vous avec votre e-mail.</string>
     <string name="field_email">E-mail</string>
     <string name="field_password">Mot de passe</string>
     <string name="field_new_password">Nouveau mot de passe</string>

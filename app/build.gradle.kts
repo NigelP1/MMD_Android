@@ -1,3 +1,13 @@
+import java.util.Properties
+
+/** Keys kept out of git, in local.properties */
+val localProperties = Properties().apply {
+    rootProject.file("local.properties").takeIf { it.exists() }?.reader()?.use(::load)
+}
+val mapsApiKey: String = localProperties.getProperty("MAPS_API_KEY")
+    ?: System.getenv("MAPS_API_KEY")
+    ?: ""
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
@@ -22,6 +32,11 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         buildConfigField("String", "API_BASE_URL", "\"https://api.makemydaylondon.uk/api/v1/\"")
+        // Maps SDK (through the manifest) and Routes API; restricted to this app's package and signing key
+        manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
+        buildConfigField("String", "MAPS_API_KEY", "\"$mapsApiKey\"")
+        // The backend's Web OAuth client: Google ID tokens are issued for it (not a secret)
+        buildConfigField("String", "GOOGLE_WEB_CLIENT_ID", "\"825957075898-t5o7bgjit1ef80vur1eoog3rkkmhamvb.apps.googleusercontent.com\"")
     }
 
     buildTypes {
@@ -58,6 +73,12 @@ dependencies {
     implementation(libs.androidx.core.splashscreen)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.browser)
+    implementation(libs.androidx.credentials)
+    implementation(libs.androidx.credentials.play.services)
+    implementation(libs.googleid)
+    implementation(libs.maps.compose)
+    implementation(libs.play.services.location)
+    implementation(libs.kotlinx.coroutines.play.services)
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.navigation.compose)

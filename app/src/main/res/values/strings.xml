@@ -26,11 +26,21 @@
     <string name="day_tomorrow">Tomorrow</string>
 
     <!-- Explore -->
-    <string name="explore_title">Near Trafalgar Square today</string>
-    <string name="nearby_title">Near %1$s today</string>
-    <string name="explore_with_events">With events today</string>
+    <string name="explore_title">Make My Day</string>
+    <string name="nearby_title">Near %1$s</string>
+    <string name="explore_with_events">With events</string>
     <string name="explore_without_events">Also nearby</string>
     <string name="explore_filtered">Showing venues that match your interests.</string>
+    <string name="explore_selected">Selected</string>
+    <string name="explore_no_events">No events nearby on this day.</string>
+    <string name="action_near_me">Near me</string>
+    <string name="action_close">Close</string>
+    <string name="action_open_settings">Open Settings</string>
+    <string name="map_search_here">Search here</string>
+    <string name="location_denied_title">Location is turned off</string>
+    <string name="location_denied_message">To find venues near you, allow Make My Day to use your location in Settings.</string>
+    <string name="location_unavailable_title">Couldn\'t find your location</string>
+    <string name="location_unavailable_message">Please try again in a moment.</string>
     <plurals name="events_and_more">
         <item quantity="one">%1$s and %2$d more</item>
         <item quantity="other">%1$s and %2$d more</item>
@@ -90,6 +100,10 @@
     <!-- Logging in and accounts -->
     <string name="login_title">Log in</string>
     <string name="login_intro">Log in to save events, plan your day and get reminders.</string>
+    <string name="action_continue_with_google">Continue with Google</string>
+    <string name="login_or_email">or use your email</string>
+    <string name="google_no_account">There\'s no Google account on this device. Add one in Settings, or log in with your email.</string>
+    <string name="google_failed">Google sign-in didn\'t work. Please try again, or log in with your email.</string>
     <string name="field_email">Email</string>
     <string name="field_password">Password</string>
     <string name="field_new_password">New password</string>

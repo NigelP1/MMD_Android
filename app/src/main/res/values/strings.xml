@@ -249,4 +249,6 @@
     <string name="error_no_app">No app on this device can open that.</string>
     <string name="detail_placeholder">Choose a venue or event to see it here</string>
     <string name="action_more_for">More options for %1$s</string>
+    <string name="action_show_map">Show map</string>
+    <string name="action_show_details">Show details</string>
 </resources>

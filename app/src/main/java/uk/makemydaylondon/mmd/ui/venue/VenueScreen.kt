@@ -1,5 +1,19 @@
 package uk.makemydaylondon.mmd.ui.venue
 
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.icons.automirrored.filled.ViewList
+import androidx.compose.material3.BottomSheetScaffold
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.SheetState
+import androidx.compose.material3.SheetValue
+import androidx.compose.material3.rememberBottomSheetScaffoldState
+import androidx.compose.material3.rememberStandardBottomSheetState
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
+import uk.makemydaylondon.mmd.ui.explore.VenueLocationMap
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -69,6 +83,7 @@ import uk.makemydaylondon.mmd.ui.common.rememberFormatter
 import uk.makemydaylondon.mmd.ui.common.relativeDay
 
 /** A venue: opening status, facilities, My Day, how to get there, description, website and upcoming events. */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun VenueScreen(
     onBack: () -> Unit,
@@ -83,25 +98,57 @@ fun VenueScreen(
     val actionError by viewModel.actionError.collectAsStateWithLifecycle()
     var pickingDay by rememberSaveable { mutableStateOf(false) }
 
-    MmdScaffold(title = (state as? LoadState.Loaded)?.value?.name.orEmpty(), onBack = onBack) { modifier ->
+    val venue = (state as? LoadState.Loaded)?.value
+    val hasMap = venue?.location?.isKnown == true
+    val sheetState = rememberStandardBottomSheetState(initialValue = SheetValue.Expanded, skipHiddenState = true)
+    val scope = rememberCoroutineScope()
+    val mapShowing = sheetState.targetValue == SheetValue.PartiallyExpanded
+
+    MmdScaffold(
+        title = venue?.name.orEmpty(),
+        onBack = onBack,
+        actions = {
+            // The sheet can be dragged, but not everyone can drag
+            if (hasMap) {
+                IconButton(onClick = { scope.launch { if (mapShowing) sheetState.expand() else sheetState.partialExpand() } }) {
+                    Icon(
+                        if (mapShowing) Icons.AutoMirrored.Filled.ViewList else Icons.Filled.Map,
+                        contentDescription = stringResource(if (mapShowing) R.string.action_show_details else R.string.action_show_map),
+                    )
+                }
+            }
+        },
+    ) { modifier ->
         when (val s = state) {
             LoadState.Loading -> CenteredProgress(modifier)
             is LoadState.Failed -> ErrorMessage(s.error, onRetry = viewModel::load, modifier = modifier)
-            is LoadState.Loaded -> Box(modifier, contentAlignment = Alignment.TopCenter) {
-                LazyColumn(Modifier.widthIn(max = ReadableWidth).fillMaxWidth()) {
-                    venueDetails(
-                        venue = s.value,
-                        myDay = myDay,
-                        signedIn = signedIn,
-                        onAddToMyDay = { if (signedIn) pickingDay = true else onLogIn() },
-                        onRemovePlan = viewModel::removePlan,
-                        onOpenEvent = { onOpenEvent(s.value.id, it) },
-                        onShowMap = onShowMap,
-                    )
+            is LoadState.Loaded -> {
+                val details: @Composable (Modifier) -> Unit = { listModifier ->
+                    Box(listModifier, contentAlignment = Alignment.TopCenter) {
+                        LazyColumn(Modifier.widthIn(max = ReadableWidth).fillMaxWidth()) {
+                            venueDetails(
+                                venue = s.value,
+                                myDay = myDay,
+                                signedIn = signedIn,
+                                onAddToMyDay = { if (signedIn) pickingDay = true else onLogIn() },
+                                onRemovePlan = viewModel::removePlan,
+                                onOpenEvent = { onOpenEvent(s.value.id, it) },
+                                onShowMap = onShowMap,
+                            )
+                        }
+                    }
+                }
+                if (hasMap) {
+                    VenueWithMap(s.value, sheetState, details, modifier)
+                } else {
+                    details(modifier)
                 }
             }
         }
     }
+
+    // Back puts the details over the map again before leaving
+    BackHandler(enabled = hasMap && mapShowing) { scope.launch { sheetState.expand() } }
 
     if (pickingDay) {
         DayPickerDialog(
@@ -113,6 +160,40 @@ fun VenueScreen(
     }
     ActionErrorDialog(actionError, onDismiss = viewModel::dismissError)
 }
+
+/**
+ * The venue's details in a sheet over a map centred on it. The sheet starts
+ * open; pulling it down leaves the venue's name showing and the map above.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun VenueWithMap(
+    venue: Venue,
+    sheetState: SheetState,
+    details: @Composable (Modifier) -> Unit,
+    modifier: Modifier,
+) {
+    BoxWithConstraints(modifier) {
+        val peekHeight = (maxHeight * 0.3f).coerceAtLeast(MinPeekHeight)
+        BottomSheetScaffold(
+            scaffoldState = rememberBottomSheetScaffoldState(sheetState),
+            sheetPeekHeight = peekHeight,
+            // The same as the rows inside it, so the header doesn't look like a separate panel
+            sheetContainerColor = MaterialTheme.colorScheme.surface,
+            sheetContent = { details(Modifier.fillMaxSize()) },
+        ) {
+            VenueLocationMap(
+                venue,
+                // Centre the pin in the part of the map the pulled-down sheet leaves
+                contentPadding = PaddingValues(bottom = peekHeight),
+                modifier = Modifier.fillMaxSize(),
+            )
+        }
+    }
+}
+
+/** Enough for the drag handle and the venue's name */
+private val MinPeekHeight = 140.dp
 
 private fun LazyListScope.venueDetails(
     venue: Venue,

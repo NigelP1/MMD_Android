@@ -248,4 +248,6 @@
     <string name="error_no_app">Aucune application de cet appareil ne peut ouvrir ce contenu.</string>
     <string name="detail_placeholder">Choisissez un lieu ou un événement pour l’afficher ici</string>
     <string name="action_more_for">Plus d’options pour %1$s</string>
+    <string name="action_show_map">Afficher la carte</string>
+    <string name="action_show_details">Afficher les détails</string>
 </resources>

@@ -50,6 +50,7 @@ import kotlinx.coroutines.isActive
 import uk.makemydaylondon.mmd.R
 import uk.makemydaylondon.mmd.data.location.GeoPoint
 import uk.makemydaylondon.mmd.data.location.point
+import uk.makemydaylondon.mmd.data.model.Venue
 import uk.makemydaylondon.mmd.ui.common.LoadState
 import uk.makemydaylondon.mmd.ui.common.VenueBadge
 
@@ -192,6 +193,40 @@ fun VenueMap(
                     .padding(top = contentPadding.calculateTopPadding() + 8.dp, start = 12.dp, end = 12.dp)
                     .widthIn(max = 480.dp),
             )
+        }
+    }
+}
+
+/** About a few streets across: close enough to see where a venue's entrance is */
+private const val VENUE_ZOOM = 16f
+
+/**
+ * One venue's pin, with the map centred on it. [contentPadding] keeps the
+ * pin clear of anything drawn over the map, such as a sheet.
+ */
+@Composable
+fun VenueLocationMap(venue: Venue, contentPadding: PaddingValues, modifier: Modifier = Modifier) {
+    val point = venue.point ?: return
+    val cameraState = rememberCameraPositionState {
+        position = CameraPosition.fromLatLngZoom(point.latLng, VENUE_ZOOM)
+    }
+    val context = LocalContext.current
+    val mapStyle = remember { MapStyleOptions.loadRawResourceStyle(context, R.raw.map_style) }
+
+    GoogleMap(
+        modifier = modifier,
+        cameraPositionState = cameraState,
+        contentPadding = contentPadding,
+        properties = MapProperties(mapStyleOptions = mapStyle),
+        uiSettings = MapUiSettings(myLocationButtonEnabled = false, mapToolbarEnabled = false, zoomControlsEnabled = false),
+        mapColorScheme = ComposeMapColorScheme.FOLLOW_SYSTEM,
+    ) {
+        MarkerComposable(
+            venue.id,
+            state = rememberUpdatedMarkerState(point.latLng),
+            title = venue.name,
+        ) {
+            VenueBadge(venue.type, hasEvents = true, size = 40.dp, modifier = Modifier.border(2.dp, MaterialTheme.colorScheme.surface, CircleShape))
         }
     }
 }

@@ -11,7 +11,6 @@
     <string name="action_back">Retour</string>
     <string name="action_cancel">Annuler</string>
     <string name="action_clear">Effacer</string>
-    <string name="action_more">Plus d’options</string>
     <string name="action_next">Suivant</string>
     <string name="action_ok">OK</string>
     <string name="action_send">Envoyer</string>
@@ -247,4 +246,6 @@
     <string name="error_generic">Une erreur s’est produite. Veuillez réessayer plus tard.</string>
     <string name="error_update_title">Mise à jour impossible</string>
     <string name="error_no_app">Aucune application de cet appareil ne peut ouvrir ce contenu.</string>
+    <string name="detail_placeholder">Choisissez un lieu ou un événement pour l’afficher ici</string>
+    <string name="action_more_for">Plus d’options pour %1$s</string>
 </resources>

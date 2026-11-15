@@ -47,17 +47,21 @@ import uk.makemydaylondon.mmd.data.model.Venue
 import uk.makemydaylondon.mmd.ui.common.EmptyState
 import uk.makemydaylondon.mmd.ui.common.ErrorMessage
 import uk.makemydaylondon.mmd.ui.common.EventRow
+import uk.makemydaylondon.mmd.ui.common.DetailSelection
 import uk.makemydaylondon.mmd.ui.common.Footnote
 import uk.makemydaylondon.mmd.ui.common.LoadState
 import uk.makemydaylondon.mmd.ui.common.ReadableWidth
 import uk.makemydaylondon.mmd.ui.common.SectionHeader
 import uk.makemydaylondon.mmd.ui.common.VenueBadge
+import uk.makemydaylondon.mmd.ui.common.selectableRow
+import uk.makemydaylondon.mmd.ui.common.selectableRowColors
 
 @Composable
 fun SearchScreen(
     onOpenVenue: (Int) -> Unit,
     onOpenEvent: (venueId: Int, eventId: Int) -> Unit,
     onOpenStation: (StationSuggestion) -> Unit,
+    selection: DetailSelection? = null,
     viewModel: SearchViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -98,9 +102,10 @@ fun SearchScreen(
                         },
                         onOpenVenue = onOpenVenue,
                         onOpenStation = onOpenStation,
+                        selection = selection,
                     )
                 } else {
-                    Results(results, state.submittedQuery.orEmpty(), viewModel::search, onOpenVenue, onOpenEvent)
+                    Results(results, state.submittedQuery.orEmpty(), viewModel::search, onOpenVenue, onOpenEvent, selection)
                 }
             }
         }
@@ -113,6 +118,7 @@ private fun Suggestions(
     onSearchEvents: () -> Unit,
     onOpenVenue: (Int) -> Unit,
     onOpenStation: (StationSuggestion) -> Unit,
+    selection: DetailSelection?,
 ) {
     if (!state.isQueryLongEnough) {
         Footnote(stringResource(R.string.search_hint))
@@ -127,17 +133,19 @@ private fun Suggestions(
             )
         }
         if (state.suggestions.venues.isNotEmpty()) {
-            item { SectionHeader(stringResource(R.string.search_venues), Modifier.semantics { heading() }) }
+            item { SectionHeader(stringResource(R.string.search_venues)) }
             items(state.suggestions.venues, key = { "v${it.id}" }) { venue ->
+                val selected = selection?.eventId == null && selection?.venueId == venue.id
                 ListItem(
-                    modifier = Modifier.clickable(role = Role.Button) { onOpenVenue(venue.id) },
+                    modifier = Modifier.selectableRow(selected) { onOpenVenue(venue.id) },
+                    colors = selectableRowColors(selected),
                     leadingContent = { Icon(Icons.Outlined.Museum, contentDescription = null) },
                     headlineContent = { Text(venue.name) },
                 )
             }
         }
         if (state.suggestions.stations.isNotEmpty()) {
-            item { SectionHeader(stringResource(R.string.search_stations), Modifier.semantics { heading() }) }
+            item { SectionHeader(stringResource(R.string.search_stations)) }
             items(state.suggestions.stations, key = { "s${it.name}" }) { station ->
                 ListItem(
                     modifier = Modifier.clickable(role = Role.Button) { onOpenStation(station) },
@@ -156,6 +164,7 @@ private fun Results(
     onRetry: () -> Unit,
     onOpenVenue: (Int) -> Unit,
     onOpenEvent: (Int, Int) -> Unit,
+    selection: DetailSelection?,
 ) {
     when (results) {
         LoadState.Loading -> Row(
@@ -173,14 +182,21 @@ private fun Results(
             LazyColumn(Modifier.fillMaxSize()) {
                 results.value.forEach { venue ->
                     item(key = "venue-${venue.id}") {
+                        val selected = selection?.eventId == null && selection?.venueId == venue.id
                         ListItem(
-                            modifier = Modifier.clickable(role = Role.Button) { onOpenVenue(venue.id) }.semantics { heading() },
+                            modifier = Modifier.selectableRow(selected) { onOpenVenue(venue.id) }.semantics { heading() },
+                            colors = selectableRowColors(selected),
                             leadingContent = { VenueBadge(venue.type, hasEvents = true, size = 32.dp) },
                             headlineContent = { Text(venue.name, style = MaterialTheme.typography.titleMedium) },
                         )
                     }
                     items(venue.events.orEmpty(), key = { "event-${it.id}" }) { event ->
-                        EventRow(event, onClick = { onOpenEvent(venue.id, event.id) }, modifier = Modifier.padding(start = 40.dp))
+                        EventRow(
+                            event,
+                            onClick = { onOpenEvent(venue.id, event.id) },
+                            indented = true,
+                            selected = selection?.eventId == event.id,
+                        )
                     }
                 }
             }

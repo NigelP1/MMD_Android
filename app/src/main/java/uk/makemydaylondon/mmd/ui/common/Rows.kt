@@ -3,9 +3,13 @@ package uk.makemydaylondon.mmd.ui.common
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemColors
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -13,6 +17,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.selected
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import uk.makemydaylondon.mmd.R
@@ -20,12 +26,24 @@ import uk.makemydaylondon.mmd.data.model.Event
 import uk.makemydaylondon.mmd.data.model.Opening
 import uk.makemydaylondon.mmd.data.model.Venue
 
+/** The venue or event showing beside a list on a wide screen, highlighted in the list */
+data class DetailSelection(val venueId: Int? = null, val eventId: Int? = null)
+
+/** A list row's colours: highlighted while it's the one showing beside the list */
+@Composable
+fun selectableRowColors(selected: Boolean): ListItemColors =
+    if (selected) ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.secondaryContainer) else ListItemDefaults.colors()
+
+/** Clickable as a button, and marked as selected for TalkBack when it is */
+fun Modifier.selectableRow(selected: Boolean, onClick: () -> Unit): Modifier =
+    clickable(role = Role.Button, onClick = onClick).then(if (selected) Modifier.semantics { this.selected = true } else Modifier)
+
 /**
  * A venue in a list: icon, name, type and distance, opening status and the
  * day's events. [showsEvents] is off where "and 18 more" would mislead.
  */
 @Composable
-fun VenueRow(venue: Venue, onClick: () -> Unit, modifier: Modifier = Modifier, showsEvents: Boolean = true) {
+fun VenueRow(venue: Venue, onClick: () -> Unit, modifier: Modifier = Modifier, showsEvents: Boolean = true, selected: Boolean = false) {
     val formatter = rememberFormatter()
     val details = listOfNotNull(
         venue.type?.name?.replaceFirstChar { it.titlecase() },
@@ -34,7 +52,8 @@ fun VenueRow(venue: Venue, onClick: () -> Unit, modifier: Modifier = Modifier, s
     val events = venue.events.orEmpty()
 
     ListItem(
-        modifier = modifier.clickable(role = Role.Button, onClick = onClick),
+        modifier = modifier.selectableRow(selected, onClick),
+        colors = selectableRowColors(selected),
         leadingContent = { VenueBadge(venue.type, venue.hasEvents) },
         headlineContent = { Text(venue.name) },
         supportingContent = {
@@ -66,10 +85,15 @@ fun EventRow(
     venueName: String? = null,
     showsDetails: Boolean = false,
     trailing: (@Composable () -> Unit)? = null,
+    selected: Boolean = false,
+    /** Under a venue's row: lines the title up with the venue's name */
+    indented: Boolean = false,
 ) {
     val formatter = rememberFormatter()
     ListItem(
-        modifier = modifier.clickable(role = Role.Button, onClick = onClick),
+        modifier = modifier.selectableRow(selected, onClick),
+        colors = selectableRowColors(selected),
+        leadingContent = if (indented) ({ Spacer(Modifier.width(32.dp)) }) else null,
         headlineContent = { Text(event.title) },
         supportingContent = {
             Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {

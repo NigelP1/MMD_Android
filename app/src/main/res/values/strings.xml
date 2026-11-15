@@ -13,7 +13,6 @@
     <string name="action_back">Back</string>
     <string name="action_cancel">Cancel</string>
     <string name="action_clear">Clear</string>
-    <string name="action_more">More options</string>
     <string name="action_next">Next</string>
     <string name="action_ok">OK</string>
     <string name="action_send">Send</string>
@@ -248,4 +247,6 @@
     <string name="error_generic">Something went wrong. Please try again later.</string>
     <string name="error_update_title">Couldn\'t update</string>
     <string name="error_no_app">No app on this device can open that.</string>
+    <string name="detail_placeholder">Choose a venue or event to see it here</string>
+    <string name="action_more_for">More options for %1$s</string>
 </resources>

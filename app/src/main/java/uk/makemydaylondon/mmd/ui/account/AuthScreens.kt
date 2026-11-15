@@ -37,6 +37,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import uk.makemydaylondon.mmd.R
 import uk.makemydaylondon.mmd.ui.CodePurpose
+import uk.makemydaylondon.mmd.ui.common.ErrorText
 import uk.makemydaylondon.mmd.ui.common.CODE_LENGTH
 import uk.makemydaylondon.mmd.ui.common.CodeField
 import uk.makemydaylondon.mmd.ui.common.FormField
@@ -151,7 +152,7 @@ private fun GoogleButton(busy: Boolean, onToken: (GoogleCredential.Token) -> Uni
         Spacer(Modifier.width(12.dp))
         Text(stringResource(R.string.action_continue_with_google))
     }
-    problem?.let { Text(stringResource(it), color = MaterialTheme.colorScheme.error) }
+    problem?.let { ErrorText(stringResource(it)) }
 }
 
 /** "Log in with a passkey": gets a challenge, shows the passkey sheet, then logs in with the result. */
@@ -185,7 +186,7 @@ private fun PasskeyLoginButton(busy: Boolean, viewModel: LoginViewModel) {
         Spacer(Modifier.width(12.dp))
         Text(stringResource(R.string.action_log_in_with_passkey))
     }
-    problem?.let { Text(stringResource(it), color = MaterialTheme.colorScheme.error) }
+    problem?.let { ErrorText(stringResource(it)) }
 }
 
 @Composable

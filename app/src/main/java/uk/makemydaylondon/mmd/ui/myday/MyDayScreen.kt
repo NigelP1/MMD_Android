@@ -1,6 +1,5 @@
 package uk.makemydaylondon.mmd.ui.myday
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -39,9 +38,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.semantics.heading
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -51,6 +47,7 @@ import uk.makemydaylondon.mmd.data.model.SavedEvent
 import uk.makemydaylondon.mmd.data.repository.MyDayState
 import uk.makemydaylondon.mmd.ui.common.ActionErrorDialog
 import uk.makemydaylondon.mmd.ui.common.CenteredProgress
+import uk.makemydaylondon.mmd.ui.common.DetailSelection
 import uk.makemydaylondon.mmd.ui.common.EmptyState
 import uk.makemydaylondon.mmd.ui.common.EventRow
 import uk.makemydaylondon.mmd.ui.common.MmdScaffold
@@ -58,6 +55,8 @@ import uk.makemydaylondon.mmd.ui.common.ReadableWidth
 import uk.makemydaylondon.mmd.ui.common.SectionHeader
 import uk.makemydaylondon.mmd.ui.common.VenueBadge
 import uk.makemydaylondon.mmd.ui.common.rememberFormatter
+import uk.makemydaylondon.mmd.ui.common.selectableRow
+import uk.makemydaylondon.mmd.ui.common.selectableRowColors
 import uk.makemydaylondon.mmd.ui.common.relativeDay
 import uk.makemydaylondon.mmd.ui.common.userMessage
 
@@ -70,6 +69,7 @@ fun MyDayScreen(
     onOpenEvent: (venueId: Int, eventId: Int) -> Unit,
     onOpenVenue: (Int) -> Unit,
     onLogIn: () -> Unit,
+    selection: DetailSelection? = null,
     viewModel: MyDayViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -110,6 +110,7 @@ fun MyDayScreen(
                             viewModel = viewModel,
                             onOpenEvent = onOpenEvent,
                             onOpenVenue = onOpenVenue,
+                            selection = selection,
                         )
                     }
                 }
@@ -125,6 +126,7 @@ private fun LazyListScope.content(
     viewModel: MyDayViewModel,
     onOpenEvent: (Int, Int) -> Unit,
     onOpenVenue: (Int) -> Unit,
+    selection: DetailSelection?,
 ) {
     val shown = if (tab == MyDayTab.MyDay) state.myDay else state.events
     val venues = if (tab == MyDayTab.MyDay) state.plannedVenues else emptyList()
@@ -148,17 +150,17 @@ private fun LazyListScope.content(
         tab == MyDayTab.MyDay -> MyDayViewModel.group(shown, venues).forEach { group ->
             item(key = "day-${group.day}") {
                 val formatter = rememberFormatter()
-                SectionHeader(formatter.relativeDay(group.day), Modifier.semantics { heading() })
+                SectionHeader(formatter.relativeDay(group.day))
             }
             items(group.events, key = { "e-${group.day}-${it.eventId}" }) { saved ->
-                SavedEventRow(saved, showsMyDayBadge = false, viewModel, onOpenEvent)
+                SavedEventRow(saved, showsMyDayBadge = false, viewModel, onOpenEvent, selection)
             }
             items(group.venues, key = { "v-${it.id}" }) { planned ->
-                PlannedVenueRow(planned, viewModel, onOpenVenue)
+                PlannedVenueRow(planned, viewModel, onOpenVenue, selection)
             }
         }
         else -> items(shown, key = { "s-${it.eventId}" }) { saved ->
-            SavedEventRow(saved, showsMyDayBadge = true, viewModel, onOpenEvent)
+            SavedEventRow(saved, showsMyDayBadge = true, viewModel, onOpenEvent, selection)
         }
     }
 }
@@ -169,6 +171,7 @@ private fun SavedEventRow(
     showsMyDayBadge: Boolean,
     viewModel: MyDayViewModel,
     onOpenEvent: (Int, Int) -> Unit,
+    selection: DetailSelection?,
 ) {
     val event = saved.event ?: return
     val venueId = saved.venue?.id
@@ -176,12 +179,14 @@ private fun SavedEventRow(
         event = event,
         venueName = saved.venue?.name,
         onClick = { if (venueId != null) onOpenEvent(venueId, event.id) },
+        selected = selection?.eventId == event.id,
         trailing = {
             Column(horizontalAlignment = Alignment.End) {
                 if (showsMyDayBadge && saved.inMyDay) {
                     Badge(containerColor = MaterialTheme.colorScheme.secondaryContainer) { Text(stringResource(R.string.tab_my_day)) }
                 }
                 RowMenu(
+                    event.title,
                     listOf(
                         stringResource(if (saved.inMyDay) R.string.action_remove_from_my_day else R.string.action_add_to_my_day) to {
                             viewModel.setInMyDay(saved, !saved.inMyDay)
@@ -195,26 +200,28 @@ private fun SavedEventRow(
 }
 
 @Composable
-private fun PlannedVenueRow(planned: PlannedVenue, viewModel: MyDayViewModel, onOpenVenue: (Int) -> Unit) {
+private fun PlannedVenueRow(planned: PlannedVenue, viewModel: MyDayViewModel, onOpenVenue: (Int) -> Unit, selection: DetailSelection?) {
     val venue = planned.venue ?: return
+    val selected = selection?.eventId == null && selection?.venueId == venue.id
     ListItem(
-        modifier = Modifier.clickable(role = Role.Button) { onOpenVenue(venue.id) },
+        modifier = Modifier.selectableRow(selected) { onOpenVenue(venue.id) },
+        colors = selectableRowColors(selected),
         leadingContent = { VenueBadge(venue.type, hasEvents = true, size = 36.dp) },
         headlineContent = { Text(venue.name) },
         supportingContent = { venue.type?.let { Text(it.name.replaceFirstChar(Char::titlecase)) } },
         trailingContent = {
-            RowMenu(listOf(stringResource(R.string.action_remove_from_my_day) to { viewModel.removePlan(planned) }))
+            RowMenu(venue.name, listOf(stringResource(R.string.action_remove_from_my_day) to { viewModel.removePlan(planned) }))
         },
     )
 }
 
 /** A row's actions, behind a "more" button (swipe gestures aren't discoverable or accessible) */
 @Composable
-private fun RowMenu(actions: List<Pair<String, () -> Unit>>) {
+private fun RowMenu(itemName: String, actions: List<Pair<String, () -> Unit>>) {
     var open by remember { mutableStateOf(false) }
     Box {
         IconButton(onClick = { open = true }) {
-            Icon(Icons.Filled.MoreVert, contentDescription = stringResource(R.string.action_more))
+            Icon(Icons.Filled.MoreVert, contentDescription = stringResource(R.string.action_more_for, itemName))
         }
         DropdownMenu(expanded = open, onDismissRequest = { open = false }) {
             actions.forEach { (label, action) ->

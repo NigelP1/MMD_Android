@@ -56,6 +56,7 @@ import uk.makemydaylondon.mmd.data.model.PasskeyChallenge
 import uk.makemydaylondon.mmd.data.network.ApiException
 import uk.makemydaylondon.mmd.data.network.MmdApi
 import uk.makemydaylondon.mmd.data.repository.MeRepository
+import uk.makemydaylondon.mmd.ui.common.ErrorText
 import uk.makemydaylondon.mmd.ui.common.CenteredProgress
 import uk.makemydaylondon.mmd.ui.common.ErrorMessage
 import uk.makemydaylondon.mmd.ui.common.Footnote
@@ -181,7 +182,7 @@ fun PasskeysScreen(onBack: () -> Unit, viewModel: PasskeysViewModel = hiltViewMo
                     }
                     item {
                         problem?.let {
-                            Text(stringResource(it), color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(horizontal = 16.dp))
+                            ErrorText(stringResource(it), Modifier.padding(horizontal = 16.dp))
                         }
                         GeneralError(error, shownFields = emptyList(), modifier = Modifier.padding(horizontal = 16.dp))
                     }

@@ -306,13 +306,13 @@ private fun LazyListScope.venueSections(nearby: NearbyResponse, onOpenVenue: (In
     if (nearby.meta.filteredByInterests) {
         item(key = "filtered") { Footnote(stringResource(R.string.explore_filtered)) }
     }
-    item(key = "with-events") { SectionHeader(stringResource(R.string.explore_with_events), Modifier.semantics { heading() }) }
+    item(key = "with-events") { SectionHeader(stringResource(R.string.explore_with_events)) }
     if (nearby.data.withEvents.isEmpty()) {
         item(key = "no-events") { Footnote(stringResource(R.string.explore_no_events)) }
     }
     items(nearby.data.withEvents, key = { "venue-${it.id}" }) { VenueRow(it, onClick = { onOpenVenue(it.id) }) }
     if (nearby.data.withoutEvents.isNotEmpty()) {
-        item(key = "without-events") { SectionHeader(stringResource(R.string.explore_without_events), Modifier.semantics { heading() }) }
+        item(key = "without-events") { SectionHeader(stringResource(R.string.explore_without_events)) }
         items(nearby.data.withoutEvents, key = { "venue-${it.id}" }) { VenueRow(it, onClick = { onOpenVenue(it.id) }) }
     }
 }

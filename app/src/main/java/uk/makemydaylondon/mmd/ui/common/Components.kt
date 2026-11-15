@@ -48,7 +48,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.autofill.ContentType
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.contentType
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.ImeAction
@@ -108,14 +111,21 @@ fun ReadableColumn(modifier: Modifier = Modifier, content: @Composable ColumnSco
     }
 }
 
+/** A section's title; TalkBack users can jump between them as headings */
 @Composable
 fun SectionHeader(text: String, modifier: Modifier = Modifier) {
     Text(
         text,
         style = MaterialTheme.typography.titleSmall,
         color = MaterialTheme.colorScheme.primary,
-        modifier = modifier.padding(start = 16.dp, end = 16.dp, top = 20.dp, bottom = 4.dp),
+        modifier = modifier.semantics { heading() }.padding(start = 16.dp, end = 16.dp, top = 20.dp, bottom = 4.dp),
     )
+}
+
+/** A problem to fix, in the error colour, read out by TalkBack when it appears */
+@Composable
+fun ErrorText(text: String, modifier: Modifier = Modifier) {
+    Text(text, color = MaterialTheme.colorScheme.error, modifier = modifier.semantics { liveRegion = LiveRegionMode.Polite })
 }
 
 /** Shown in place of an empty list: an icon, a title, a line of help and maybe a button. */
@@ -164,7 +174,7 @@ fun GeneralError(error: ApiException?, shownFields: Collection<String>, modifier
     if (fields.isNotEmpty() && shownFields.containsAll(fields)) return
     Row(modifier, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         Icon(Icons.Outlined.ErrorOutline, contentDescription = null, tint = MaterialTheme.colorScheme.error)
-        Text(error.userMessage(), color = MaterialTheme.colorScheme.error)
+        ErrorText(error.userMessage())
     }
 }
 

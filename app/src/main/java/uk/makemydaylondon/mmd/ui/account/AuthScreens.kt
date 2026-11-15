@@ -4,6 +4,8 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Key
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -86,6 +88,7 @@ fun ColumnScope.LoginForm(actions: LoginActions, viewModel: LoginViewModel = hil
 
     Text(stringResource(R.string.login_intro), color = MaterialTheme.colorScheme.onSurfaceVariant)
     GoogleButton(busy = busy, onToken = viewModel::signInWithGoogle, onPickerOpened = viewModel::clearError)
+    PasskeyLoginButton(busy = busy, viewModel = viewModel)
     Text(
         stringResource(R.string.login_or_email),
         style = MaterialTheme.typography.labelLarge,
@@ -147,6 +150,40 @@ private fun GoogleButton(busy: Boolean, onToken: (GoogleCredential.Token) -> Uni
         Icon(painterResource(R.drawable.ic_google), contentDescription = null, tint = Color.Unspecified, modifier = Modifier.size(18.dp))
         Spacer(Modifier.width(12.dp))
         Text(stringResource(R.string.action_continue_with_google))
+    }
+    problem?.let { Text(stringResource(it), color = MaterialTheme.colorScheme.error) }
+}
+
+/** "Log in with a passkey": gets a challenge, shows the passkey sheet, then logs in with the result. */
+@Composable
+private fun PasskeyLoginButton(busy: Boolean, viewModel: LoginViewModel) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    var working by remember { mutableStateOf(false) }
+    var problem by rememberSaveable { mutableStateOf<Int?>(null) }
+
+    OutlinedButton(
+        onClick = {
+            problem = null
+            working = true
+            scope.launch {
+                viewModel.passkeyChallenge()?.let { challenge ->
+                    when (val result = PasskeyCredentials.logIn(context, challenge.options)) {
+                        is PasskeyResult.Success -> viewModel.logInWithPasskey(challenge, result.json)
+                        PasskeyResult.NoPasskey -> problem = R.string.passkey_none
+                        PasskeyResult.Cancelled -> Unit
+                        else -> problem = R.string.passkey_failed
+                    }
+                }
+                working = false
+            }
+        },
+        enabled = !busy && !working,
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Icon(Icons.Outlined.Key, contentDescription = null, modifier = Modifier.size(18.dp))
+        Spacer(Modifier.width(12.dp))
+        Text(stringResource(R.string.action_log_in_with_passkey))
     }
     problem?.let { Text(stringResource(it), color = MaterialTheme.colorScheme.error) }
 }

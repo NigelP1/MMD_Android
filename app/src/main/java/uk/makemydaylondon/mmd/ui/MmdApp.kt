@@ -41,6 +41,7 @@ import uk.makemydaylondon.mmd.ui.account.DeleteAccountScreen
 import uk.makemydaylondon.mmd.ui.account.EmailCodeScreen
 import uk.makemydaylondon.mmd.ui.account.ForgotPasswordScreen
 import uk.makemydaylondon.mmd.ui.account.InterestsScreen
+import uk.makemydaylondon.mmd.ui.account.PasskeysScreen
 import uk.makemydaylondon.mmd.ui.account.LoginActions
 import uk.makemydaylondon.mmd.ui.account.LoginScreen
 import uk.makemydaylondon.mmd.ui.account.RegisterScreen
@@ -179,6 +180,7 @@ private fun MmdNavHost(navController: NavHostController, onShowWelcome: () -> Un
                 onOpenInterests = { navController.navigate(InterestsRoute) },
                 onOpenDeleteAccount = { navController.navigate(DeleteAccountRoute) },
                 onOpenInfo = { navController.navigate(InfoRoute) },
+                onOpenPasskeys = { navController.navigate(PasskeysRoute) },
             )
         }
 
@@ -215,6 +217,7 @@ private fun MmdNavHost(navController: NavHostController, onShowWelcome: () -> Un
             )
         }
         composable<InterestsRoute> { InterestsScreen(onBack = back) }
+        composable<PasskeysRoute> { PasskeysScreen(onBack = back) }
         composable<DeleteAccountRoute> {
             DeleteAccountScreen(onBack = back, onDeleted = { navController.popBackStack<AccountRoute>(inclusive = false) })
         }

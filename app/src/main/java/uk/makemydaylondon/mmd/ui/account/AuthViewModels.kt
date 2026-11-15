@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
+import uk.makemydaylondon.mmd.data.model.PasskeyChallenge
 import uk.makemydaylondon.mmd.data.network.ApiException
 import uk.makemydaylondon.mmd.data.repository.AuthRepository
 import uk.makemydaylondon.mmd.data.session.SessionManager
@@ -50,6 +51,25 @@ class LoginViewModel @Inject constructor(private val auth: AuthRepository) : For
         submit {
             val response = auth.signInWithGoogle(token.idToken, token.nonce)
             if (response.created) LoginOutcome.NewAccount else LoginOutcome.LoggedIn
+        }
+    }
+
+    /** The server's challenge for the passkey sheet, or null (with [error] set) if it couldn't be had */
+    suspend fun passkeyChallenge(): PasskeyChallenge? {
+        clearError()
+        return try {
+            auth.passkeyLoginOptions()
+        } catch (e: ApiException) {
+            fail(e)
+            null
+        }
+    }
+
+    /** [credentialJson] is what the passkey sheet returned for [challenge] */
+    fun logInWithPasskey(challenge: PasskeyChallenge, credentialJson: String) {
+        submit {
+            auth.signInWithPasskey(challenge.challengeId, credentialJson)
+            LoginOutcome.LoggedIn
         }
     }
 

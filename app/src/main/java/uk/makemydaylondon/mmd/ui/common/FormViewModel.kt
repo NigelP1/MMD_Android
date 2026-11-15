@@ -31,6 +31,11 @@ abstract class FormViewModel<T : Any> : ViewModel() {
         _error.value = null
     }
 
+    /** Shows [error] as if a submitted request had failed */
+    protected fun fail(error: ApiException) {
+        _error.value = error
+    }
+
     /** Runs [block] unless a request is already in flight; its result becomes the outcome. */
     protected fun submit(block: suspend () -> T?) {
         if (_busy.value) return

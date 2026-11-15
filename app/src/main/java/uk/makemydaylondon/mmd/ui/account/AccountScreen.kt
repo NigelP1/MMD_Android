@@ -9,6 +9,7 @@ import androidx.compose.material.icons.outlined.DeleteOutline
 import androidx.compose.material.icons.outlined.DevicesOther
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.Key
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -43,6 +44,7 @@ fun AccountScreen(
     onOpenInterests: () -> Unit,
     onOpenDeleteAccount: () -> Unit,
     onOpenInfo: () -> Unit,
+    onOpenPasskeys: () -> Unit,
     viewModel: AccountViewModel = hiltViewModel(),
 ) {
     val session by viewModel.session.collectAsStateWithLifecycle()
@@ -56,7 +58,7 @@ fun AccountScreen(
                 MenuRow(Icons.Outlined.Info, stringResource(R.string.info_title), onOpenInfo)
             }
             is SessionState.SignedIn -> ReadableColumn(modifier) {
-                AccountDetails(s.account, viewModel, onOpenInterests, onOpenDeleteAccount, onOpenInfo)
+                AccountDetails(s.account, viewModel, onOpenInterests, onOpenDeleteAccount, onOpenInfo, onOpenPasskeys)
             }
         }
     }
@@ -69,6 +71,7 @@ private fun AccountDetails(
     onOpenInterests: () -> Unit,
     onOpenDeleteAccount: () -> Unit,
     onOpenInfo: () -> Unit,
+    onOpenPasskeys: () -> Unit,
 ) {
     val busy by viewModel.busy.collectAsStateWithLifecycle()
     val error by viewModel.error.collectAsStateWithLifecycle()
@@ -80,6 +83,7 @@ private fun AccountDetails(
     }
     HorizontalDivider()
     MenuRow(Icons.Outlined.FavoriteBorder, stringResource(R.string.interests_menu), onOpenInterests)
+    MenuRow(Icons.Outlined.Key, stringResource(R.string.passkeys_title), onOpenPasskeys)
     MenuRow(Icons.Outlined.Info, stringResource(R.string.info_title), onOpenInfo)
     HorizontalDivider()
     MenuRow(Icons.AutoMirrored.Outlined.Logout, stringResource(R.string.action_log_out), viewModel::logOut, enabled = !busy)

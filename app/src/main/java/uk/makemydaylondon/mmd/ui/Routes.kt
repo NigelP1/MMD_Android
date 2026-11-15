@@ -33,6 +33,7 @@ import kotlinx.serialization.Serializable
 enum class CodePurpose { VerifyEmail, ResetPassword }
 
 @Serializable data object InterestsRoute
+@Serializable data object PasskeysRoute
 @Serializable data object DeleteAccountRoute
 
 // Information

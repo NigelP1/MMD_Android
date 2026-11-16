@@ -1,6 +1,5 @@
 package uk.makemydaylondon.mmd.ui.venue
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -100,7 +99,7 @@ fun VenueScreen(
 
     val venue = (state as? LoadState.Loaded)?.value
     val hasMap = venue?.location?.isKnown == true
-    val sheetState = rememberStandardBottomSheetState(initialValue = SheetValue.Expanded, skipHiddenState = true)
+    val sheetState = rememberStandardBottomSheetState(initialValue = SheetValue.PartiallyExpanded, skipHiddenState = true)
     val scope = rememberCoroutineScope()
     val mapShowing = sheetState.targetValue == SheetValue.PartiallyExpanded
 
@@ -147,9 +146,6 @@ fun VenueScreen(
         }
     }
 
-    // Back puts the details over the map again before leaving
-    BackHandler(enabled = hasMap && mapShowing) { scope.launch { sheetState.expand() } }
-
     if (pickingDay) {
         DayPickerDialog(
             initialDay = viewModel.date,
@@ -163,7 +159,7 @@ fun VenueScreen(
 
 /**
  * The venue's details in a sheet over a map centred on it. The sheet starts
- * open; pulling it down leaves the venue's name showing and the map above.
+ * low, with the venue's name showing and the map above; pull it up for the rest.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
